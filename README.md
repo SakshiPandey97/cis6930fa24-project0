@@ -19,7 +19,8 @@ pipenv run python main.py --incidents https://www.normanok.gov/sites/default/fil
 ## Design Decisions
 Temporary File for PDF Processing:
 The PDF is temporarily saved to /tmp/downloaded_file.pdf before processing. While efficient for this project, in real-world applications, it may be necessary to store the PDF files long-term for record-keeping and audits.
-
+Locations are all caps
+Nature the first letter caps and then the rest lowercase
 # Edge Case Handling:
 Handling "911" in Location vs. Nature: A specific edge case occurs with the "911" keyword. In some reports, "911" is part of the location, while in others, it's part of the nature of the incident. To resolve this, a custom hard-coded solution ensures that "911" is correctly attributed based on context:
 For example:
