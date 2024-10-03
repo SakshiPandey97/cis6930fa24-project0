@@ -1,5 +1,5 @@
 import os
-import main
+from project0 import main
 import pytest
 
 def test_extractincidents():

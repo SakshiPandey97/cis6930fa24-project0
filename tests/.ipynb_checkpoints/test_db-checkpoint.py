@@ -1,7 +1,8 @@
 import os
 import sqlite3
 import pytest
-import project0
+from project0 import main
+
 
 @pytest.fixture
 def test_db():
