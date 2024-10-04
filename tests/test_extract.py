@@ -1,5 +1,6 @@
 import os
-from project0 import main
+from project0.project0 import extractincidents
+from pypdf import PdfReader
 import pytest
 
 def test_extractincidents():
@@ -9,10 +10,10 @@ def test_extractincidents():
         pdf_data = f.read()
     
     
-    incidents = main.project0.extractincidents(pdf_data)
+    incidents = extractincidents(pdf_data)
     print(len(incidents))
     assert len(incidents) == 408, "Incorrect number of incidents."
-    reader = main.project0.PdfReader(test_pdf_path)
+    reader = PdfReader(test_pdf_path)
     total_pages = len(reader.pages)
     assert total_pages == 25, f"Incorrect number of pages."
     

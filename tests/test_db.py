@@ -1,9 +1,7 @@
 import os
 import sqlite3
 import pytest
-from project0 import main
-
-
+from project0.project0 import createdb, populatedb, status
 @pytest.fixture
 def test_db():
     db = sqlite3.connect(':memory:')
@@ -19,7 +17,7 @@ def test_db():
     db.close()
 
 def test_createdb():
-    conn = project0.createdb()
+    conn = createdb()
     cursor = conn.cursor()
     
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='incidents';")
@@ -32,7 +30,7 @@ def test_populatedb(test_db):
         {'Date/Time': '10/31/2024 00:00', 'Incident Number': '2024-00006666', 'Location': 'CRYSTAL LAKE', 'Nature': 'Slasher Attack', 'Incident ORI': 'EMSSTAT'}
     ]
     
-    project0.populatedb(test_db, incidents)
+    populatedb(test_db, incidents)
     
     cursor = test_db.cursor()
     cursor.execute("SELECT * FROM incidents;")
@@ -49,9 +47,9 @@ def test_status(test_db, capsys):
         {'Date/Time': '10/30/2024 03:00', 'Incident Number': '2024-00009999', 'Location': 'Camp Crystal Lake', 'Nature': 'Slasher Attack', 'Incident ORI': 'OK7654321'}
     ]
 
-    project0.populatedb(test_db, mock_incidents)
+    populatedb(test_db, mock_incidents)
 
-    project0.status(test_db)
+    status(test_db)
 
     captured = capsys.readouterr()
 

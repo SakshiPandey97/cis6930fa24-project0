@@ -1,5 +1,5 @@
 import argparse
-import project0
+from project0 import fetchincidents, extractincidents, createdb, populatedb, status
 
 def main(url):
     
