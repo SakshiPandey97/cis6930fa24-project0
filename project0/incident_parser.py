@@ -95,8 +95,6 @@ def extractincidents(pdf_data):
 def createdb():
     home_db = "resources"
     db_path = os.path.join(home_db, "normanpd.db")
-    #should I delete db if it already exists? we get wrong results in our status check otherwise
-    #deleting the db to ensure that issue doesn't happen 
     if os.path.exists(db_path):
         os.remove(db_path)
     if not os.path.exists(home_db):
