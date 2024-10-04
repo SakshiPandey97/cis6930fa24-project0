@@ -8,6 +8,7 @@ This project is designed to ensure accurate data extraction while handling the c
 <a href="https://youtu.be/Kh1HKSH_rCw" target="_blank">
   <img src="https://img.youtube.com/vi/Kh1HKSH_rCw/0.jpg" alt="Watch the video" style="width:100%;"/>
 </a>
+
 ## Potential Use-Cases
 We could use this to turn messy PDF reports into clean, structured data, making it easy to store and pull up whenever needed. It would also be great for creating visual dashboards or charts to track crime patterns and see trends over time, helping people keep an eye on incidents in specific areas.
 Some Specific Areas of Use:
