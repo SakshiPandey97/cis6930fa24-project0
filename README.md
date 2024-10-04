@@ -64,7 +64,7 @@ pipenv run python main.py --incidents https://www.normanok.gov/sites/default/fil
 5.  The code skips over empty lines and lines that only contain dates without incident details to avoid processing irrelevant data. It uses a regex pattern to match lines that are just dates and skips them. The regex pattern (r"^\d{1,2}/\d{1,2}/\d{4}(\s+\d{1,2}:\d{2})?$") assumes that dates follow the format MM/DD/YYYY and that the time (if present) is in HH:MM format. If this isn't followed then parsing and removing the last line of the pdf(which has only Date / Time and no incident) fails.
 
 ## Tests
-3 Test Cases were used to test this software they individually test each function in the incident_parser.py. 
-test_fetchincidents.py: Two tests are carried out here. The first test mocks a successful HTTP response and verifies that the fetched data matches the expected result. The second test simulates an HTTP 404 error to ensure the function handles it correctly by returning None.
-test_extract.py: This test checks if the system correctly extracts incidents from a PDF. It verifies the total number of incidents, validates the details of the first, a random, and the last incident, ensuring all data is parsed correctly.
-test_db.py: This test checks if the database is correctly created, populated, and if the status() function outputs the correct incident summary. 
+3 Test Cases were used to test this software they individually test each function in the incident_parser.py:
+1. test_fetchincidents.py: Two tests are carried out here. The first test mocks a successful HTTP response and verifies that the fetched data matches the expected result. The second test simulates an HTTP 404 error to ensure the function handles it correctly by returning None.
+2. test_extract.py: This test checks if the system correctly extracts incidents from a PDF. It verifies the total number of incidents, validates the details of the first, a random, and the last incident, ensuring all data is parsed correctly.
+3. test_db.py: This test checks if the database is correctly created, populated, and if the status() function outputs the correct incident summary. 
