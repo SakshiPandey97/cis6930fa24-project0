@@ -1,4 +1,4 @@
-# cis6930fa24-project0
+# cis6930fa24-project0 By: Sakshi Pandey
 ## Basic Premise
 The purpose of this project is to automatically fetch, extract, and allow the user analyze daily incident summaries from the Norman Police Department. The software parses relevant incident details such as Date/Time, Incident Number, Location, Nature, and Incident ORI, and stores them in a SQLite database. The database is then queried to obtain the count of different types of incidents.
 
@@ -62,3 +62,9 @@ pipenv run python main.py --incidents https://www.normanok.gov/sites/default/fil
 3. The code assumes that if an incident spans multiple lines and the line has fewer than 5 parts (ex. It doesn't follow the expected pattern of Date/Time, Incident Number, Location, Nature, Incident ORI), the line is always part of the Location. This might be problematic if other fields (like Nature) also span multiple lines, as the code currently appends these lines to Location without verifying if it's indeed location data. However I feel this assumption is reasonable following manually looking at various pdf reports. Nature is always concise and summarized in 2-3 words. I had initially tried adding additional check with common words such as Ave or St but I feel this solution is clean and decided not to include those checks. 
 4. The code assumes that the layout of the incident PDF files will remain consistent, specifically relying on fixed patterns such as headers. It assumes that each incident follows a similar structure (Date/Time, Incident Number, Location, Nature, and Incident ORI). Therefore, the code depends on splitting lines into exactly 5 parts using multiple spaces (\s{2,}). If the PDF structure changes significantly, the extraction process would break.
 5.  The code skips over empty lines and lines that only contain dates without incident details to avoid processing irrelevant data. It uses a regex pattern to match lines that are just dates and skips them. The regex pattern (r"^\d{1,2}/\d{1,2}/\d{4}(\s+\d{1,2}:\d{2})?$") assumes that dates follow the format MM/DD/YYYY and that the time (if present) is in HH:MM format. If this isn't followed then parsing and removing the last line of the pdf(which has only Date / Time and no incident) fails.
+
+## Tests
+3 Test Cases were used to test this software they individually test each function in the incident_parser.py. 
+test_fetchincidents.py: Two tests are carried out here. The first test mocks a successful HTTP response and verifies that the fetched data matches the expected result. The second test simulates an HTTP 404 error to ensure the function handles it correctly by returning None.
+test_extract.py: This test checks if the system correctly extracts incidents from a PDF. It verifies the total number of incidents, validates the details of the first, a random, and the last incident, ensuring all data is parsed correctly.
+test_db.py: This test checks if the database is correctly created, populated, and if the status() function outputs the correct incident summary. 
