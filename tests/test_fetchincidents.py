@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError
-from project0.project0 import fetchincidents
+from project0.incident_parser import fetchincidents
 import pytest
 
 @patch('urllib.request.urlopen')

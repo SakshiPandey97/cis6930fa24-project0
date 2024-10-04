@@ -1,25 +1,22 @@
 import argparse
-from project0 import fetchincidents, extractincidents, createdb, populatedb, status
+from project0 import incident_parser 
 
 def main(url):
+    incident_data = incident_parser.fetchincidents(url)
+    incidents = incident_parser.extractincidents(incident_data)
     
-    incident_data = project0.fetchincidents(url)
-    incidents = project0.extractincidents(incident_data)
+    db = incident_parser.createdb()
+    incident_parser.populatedb(db, incidents)
     
-    
-    db = project0.createdb()
-    project0.populatedb(db, incidents)
-    
-    
-    project0.status(db)
+    incident_parser.status(db)
     
     db.close()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--incidents", type=str, required=True, 
-                         help="Incident summary url.")
-     
+                        help="Incident summary url.")
+    
     args = parser.parse_args()
     if args.incidents:
         main(args.incidents)

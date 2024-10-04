@@ -1,7 +1,8 @@
 import os
 import sqlite3
 import pytest
-from project0.project0 import createdb, populatedb, status
+from project0.incident_parser import createdb, populatedb, status
+
 @pytest.fixture
 def test_db():
     db = sqlite3.connect(':memory:')

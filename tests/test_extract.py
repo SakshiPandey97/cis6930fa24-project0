@@ -1,5 +1,5 @@
 import os
-from project0.project0 import extractincidents
+from project0.incident_parser import extractincidents
 from pypdf import PdfReader
 import pytest
 
