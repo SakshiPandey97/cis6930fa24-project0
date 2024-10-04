@@ -18,7 +18,7 @@ def fetchincidents(url):
     except HTTPError as e:
         print(f"HTTP Error: {e.code} - {e.reason}")
         return None
-    
+
 def extractincidents(pdf_data):
     pdf_file_path = '/tmp/downloaded_file.pdf'
     with open(pdf_file_path, 'wb') as f:
@@ -32,7 +32,7 @@ def extractincidents(pdf_data):
         current_incident = None
         skipped_lines = []
         
-        date_or_datetime_pattern = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}(\s+\d{1,2}:\d{2})?$")
+        date_pattern = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}(\s+\d{1,2}:\d{2})?$")
 
         for i in range(len(reader.pages)):
             page = reader.pages[i]
@@ -56,14 +56,14 @@ def extractincidents(pdf_data):
                     continue
 
                 
-                if line == "" or date_or_datetime_pattern.match(line):
+                if line == "" or date_pattern.match(line):
                     skipped_lines.append(line)
                     continue
 
                 parts = re.split(r'\s{2,}', line)
 
                 if len(parts) < 5:
-                    if current_incident and not date_or_datetime_pattern.match(line):
+                    if current_incident and not date_pattern.match(line):
                         current_incident['Location'] += " " + line
                     else:
                         skipped_lines.append(line)

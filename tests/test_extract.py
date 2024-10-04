@@ -38,7 +38,7 @@ def test_extractincidents():
     assert target_incident['Incident ORI'] == 'OK0140200', "Wrong"
     print(f"Extracted incident 2024-00056658: {target_incident}")
     
-    # Last one    
+    # Last one
     last_incident = incidents[-1]
     assert last_incident is not None, "Wrong"
     assert last_incident['Date/Time'] == '8/5/2024 23:58', "Wrong"
