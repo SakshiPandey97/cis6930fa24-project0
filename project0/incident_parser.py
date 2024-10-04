@@ -46,11 +46,11 @@ def extractincidents(pdf_data):
             for line in lines:
                 line = line.strip()
                 line_count += 1
-
+                #ignore the title
                 if line == "NORMAN POLICE DEPARTMENT" or line == "Daily Incident Summary (Public)":
                     skipped_lines.append(line)
                     continue
-
+                #ignore the headers
                 if all(keyword in line for keyword in ["Date / Time", "Incident Number", "Location", "Nature", "Incident ORI"]):
                     skipped_lines.append(line)
                     continue
@@ -61,7 +61,7 @@ def extractincidents(pdf_data):
                     continue
 
                 parts = re.split(r'\s{2,}', line)
-
+                #assumption for multi-line locations.
                 if len(parts) < 5:
                     if current_incident and not date_pattern.match(line):
                         current_incident['Location'] += " " + line
@@ -130,8 +130,9 @@ def status(db):
         FROM incidents
         WHERE nature IS NOT NULL AND nature != ''
         GROUP BY nature
-        ORDER BY nature ASC;
+        ORDER BY nature COLLATE BINARY ASC;
     ''')
+    #collate uses the unicode values to sort. so case-sensitive, the uppercase will come first.
     rows = cursor.fetchall()
 
     for row in rows:
