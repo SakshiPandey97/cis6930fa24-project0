@@ -3,7 +3,11 @@
 The purpose of this project is to automatically fetch, extract, and allow the user analyze daily incident summaries from the Norman Police Department. The software parses relevant incident details such as Date/Time, Incident Number, Location, Nature, and Incident ORI, and stores them in a SQLite database. The database is then queried to obtain the count of different types of incidents.
 
 This project is designed to ensure accurate data extraction while handling the challenges of unstructured PDF data(specifically Norman PD's), and it maintains data integrity by resetting the database on every run.
-
+## Video Demo
+<!-- Embed YouTube Video -->
+<a href="https://youtu.be/Kh1HKSH_rCw" target="_blank">
+  <img src="https://img.youtube.com/vi/Kh1HKSH_rCw/0.jpg" alt="Watch the video" style="width:100%;"/>
+</a>
 ## Potential Use-Cases
 We could use this to turn messy PDF reports into clean, structured data, making it easy to store and pull up whenever needed. It would also be great for creating visual dashboards or charts to track crime patterns and see trends over time, helping people keep an eye on incidents in specific areas.
 Some Specific Areas of Use:
