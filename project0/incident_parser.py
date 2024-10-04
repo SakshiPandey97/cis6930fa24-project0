@@ -18,143 +18,79 @@ def fetchincidents(url):
     except HTTPError as e:
         print(f"HTTP Error: {e.code} - {e.reason}")
         return None
-
-def extractincidents(pdf_data):
-    def clean_location(location, case_number, ori):
-        location = location.replace(case_number, "").strip()
-        location = location.replace(ori, "").strip()
-
-        #Remove datetime patterns and the title
-        date_time_pattern = re.compile(r"\d{1,2}/\d{1,2}/\d{4}\s+\d{1,2}:\d{2}")
-        location = date_time_pattern.sub("", location).strip()
-        location = location.replace("NORMAN POLICE DEPARTMENT", "").strip()
-        #print(location)
-        return location
-
-    def extract_location_nature(location_text, case_number, ori):
-        location_text = clean_location(location_text, case_number, ori)
-        #Check for 911 or Traffic (capital and then lowercase) or / Assault
-        nature_pattern = re.compile(r"(MVA|COP|911|[A-Z][a-z]+(?:/[A-Z][a-z]+)?)")
-        
-        location_parts = location_text.split()
-        location = []
-        nature = []
-        is_nature = False
-
-        for part in location_parts:
-            if nature_pattern.match(part):  
-                is_nature = True
-                nature.append(part)
-            elif not is_nature:  
-                location.append(part)
-            else:
-                nature.append(part)
-
-        location_str = ' '.join(location).strip()
-        nature_str = ' '.join(nature).strip()
-        
-
-        if location:
-            last_word = location[-1]
-            #check for appended words when there are two lines in location
-            split_index = None
-            for i in range(len(last_word)):
-                if last_word[i].isupper() and i + 1 < len(last_word) and last_word[i+1].islower():
-                    split_index = i
-                    break
-            
-            if split_index is not None:
-                location_part = last_word[:split_index]
-                nature_part = last_word[split_index:]
-
-                location[-1] = location_part
-                nature_str = f"{nature_part} {nature_str}".strip()
-              
-        #for edgecase on 8/05 bad solution and tedious
-        nature_parts = nature_str.split()
-        if nature_str.startswith("911") and len(nature_parts) > 1 and (len(nature_parts[1]) == 1 and nature_parts[1].isupper()) or (len(nature_parts) > 1 and nature_parts[1].isupper()):
-            location_parts = []
-
-            for i, part in enumerate(nature_parts):
-                if part.isdigit() or part.isupper():
-                    location_parts.append(part)
-                else:
-                    break
-
-            location_str = f"{location_str} {' '.join(location_parts)}".strip()
-            remaining_nature_parts = nature_parts[len(location_parts):]
-            nature_str = ' '.join(remaining_nature_parts).strip()
-
-        if not location_str:
-            location_str = ' '.join(location_parts).strip()
-        
-        return ' '.join(location).strip(), nature_str
-
-    pdf_file_path = '/tmp/downloaded_file.pdf'
-    with open(pdf_file_path, 'wb') as temp_file:
-        temp_file.write(pdf_data)
     
-    with open(pdf_file_path, 'rb') as file:
-        reader = PdfReader(file)
+def extractincidents(pdf_data):
+    pdf_file_path = '/tmp/downloaded_file.pdf'
+    with open(pdf_file_path, 'wb') as f:
+        f.write(pdf_data)
 
-        date_time_pattern = re.compile(r"(\d{1,2}/\d{1,2}/\d{4}\s+\d{1,2}:\d{2})")
-        case_number_pattern = re.compile(r"(2024-\d{8})")
-        ori_pattern = re.compile(r"(OK\d{7}|EMSSTAT|14005)")
+    with open(pdf_file_path, 'rb') as f:
+        reader = PdfReader(f)
 
         incidents = []
-        unique_incidents = set()
+        line_count = 0
+        current_incident = None
+        skipped_lines = []
+        
+        date_or_datetime_pattern = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}(\s+\d{1,2}:\d{2})?$")
 
-        for page_num in range(len(reader.pages)):
-            page = reader.pages[page_num]
-            text = page.extract_text()
-
-            if not text:
+        for i in range(len(reader.pages)):
+            page = reader.pages[i]
+            text = page.extract_text(extraction_mode="layout")
+            
+            if text is None:
                 continue
 
-            entries = text.split('\n')
-            incident = {}
-            location_lines = []
+            lines = text.split('\n')
 
-            for entry in entries:
-                entry = entry.strip()
+            for line in lines:
+                line = line.strip()
+                line_count += 1
 
-                if not entry:
+                if line == "NORMAN POLICE DEPARTMENT" or line == "Daily Incident Summary (Public)":
+                    skipped_lines.append(line)
+                    continue
+
+                if all(keyword in line for keyword in ["Date / Time", "Incident Number", "Location", "Nature", "Incident ORI"]):
+                    skipped_lines.append(line)
                     continue
 
                 
-                date_time = date_time_pattern.search(entry)
-                if date_time:
-                    if 'Date/Time' in incident and 'Incident Number' in incident:
-                        if location_lines:
-                            location_text = ' '.join(location_lines).strip()
-                            incident['Location'], incident['Nature'] = extract_location_nature(location_text, incident['Incident Number'], incident.get('Incident ORI', ''))
-                        incidents.append(incident)
-                        incident = {}
-                        location_lines = []  
-                    incident['Date/Time'] = date_time.group(1)
+                if line == "" or date_or_datetime_pattern.match(line):
+                    skipped_lines.append(line)
+                    continue
 
-                case_number = case_number_pattern.search(entry)
-                if case_number:
-                    incident['Incident Number'] = case_number.group(1)
+                parts = re.split(r'\s{2,}', line)
 
-                #get ORI or like EMSSTAT and 14005 
-                #put in README
-                ori = ori_pattern.search(entry)
-                if ori:
-                    incident['Incident ORI'] = ori.group(1)
+                if len(parts) < 5:
+                    if current_incident and not date_or_datetime_pattern.match(line):
+                        current_incident['Location'] += " " + line
+                    else:
+                        skipped_lines.append(line)
+                    continue
 
-                #get potential location and nature for further parsing
-                if case_number or ori:
-                    location_lines.append(entry)
+                date_time = parts[0]
+                incident_number = parts[1]
+                location = parts[2]
+                nature = parts[3]
+                ori = parts[4]
 
-            
-            if 'Date/Time' in incident and 'Incident Number' in incident:
-                if location_lines:
-                    location_text = ' '.join(location_lines).strip()
-                    incident['Location'], incident['Nature'] = extract_location_nature(location_text, incident['Incident Number'], incident.get('Incident ORI', ''))
-                incidents.append(incident)
+                current_incident = {
+                    'Date/Time': date_time,
+                    'Incident Number': incident_number,
+                    'Location': location,
+                    'Nature': nature,
+                    'Incident ORI': ori
+                }
 
+                incidents.append(current_incident)
+
+        #print(f"Total: {len(incidents)}")
+        #print("Skipped lines:", skipped_lines)
         return incidents
+
+
+
 
 def createdb():
     home_db = "resources"
